@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 #-------------------------------------------------------------------------------
-# qwiic_template_ex1_title.py TODO: replace template and title
+# qwiic_as726x_ex3_bulb.py
 #
-# TODO: Add description for this example
+# This example shows how to take 4-channel measurements with the bulb enabled
 #-------------------------------------------------------------------------------
-# Written by SparkFun Electronics, TODO: month and year
+# Written by SparkFun Electronics, December 2024
 #
 # This python library supports the SparkFun Electroncis Qwiic ecosystem
 #
@@ -33,26 +33,58 @@
 # SOFTWARE.
 #===============================================================================
 
-import qwiic_template # TODO Import correct package
+import qwiic_as726x
 import sys
 
 def runExample():
-	# TODO Replace template and title
-	print("\nQwiic Template Example 1 - Title\n")
+	print("\nQwiic AS726x Example 3 - Bulb\n")
 
 	# Create instance of device
-	myDevice = qwiic_template.QwiicTemplate() # TODO update as needed
+	myAS726x = qwiic_as726x.QwiicAS726x()
 
 	# Check if it's connected
-	if myDevice.is_connected() == False:
+	if myAS726x.is_connected() == False:
 		print("The device isn't connected to the system. Please check your connection", \
 			file=sys.stderr)
 		return
 
-	# Initialize the device
-	myDevice.begin()
+	# Set a desired custom Gain or Measurement Mode here, to be passed to the begin() function
+	gain = myAS726x.kGain16x
+	measurementMode = myAS726x.kMeasurementMode4Chan # 4-channel reading 
+													 # on the as7262: V, B, G, Y (O and R will be 0)
+						 							 # on the as7263: S, T, U, V (R and W will be 0)
 
-	# TODO Add basic example code
+	# Initialize the device with non-default settings
+	myAS726x.begin(gain, measurementMode)
+
+	while True:
+		# Enable the bulb for our measurements
+		myAS726x.take_measurements_with_bulb()
+
+		# Check which device is connected
+		if myAS726x.get_version() == myAS726x.kSensorTypeAs7262:
+			# Visible readings
+			print(" Reading: V[{}] B[{}] G[{}] Y[{}] O[{}] R[{}]".format(
+				myAS726x.get_calibrated_violet(),
+				myAS726x.get_calibrated_blue(),
+				myAS726x.get_calibrated_green(),
+				myAS726x.get_calibrated_yellow(),
+				myAS726x.get_calibrated_orange(),
+				myAS726x.get_calibrated_red()
+			))
+		
+		elif myAS726x.get_version() == myAS726x.kSensorTypeAs7263:
+			# Near IR readings
+			print(" Reading: R[{}] S[{}] T[{}] U[{}] V[{}] W[{}]".format(
+				myAS726x.get_calibrated_r(),
+				myAS726x.get_calibrated_s(),
+				myAS726x.get_calibrated_t(),
+				myAS726x.get_calibrated_u(),
+				myAS726x.get_calibrated_v(),
+				myAS726x.get_calibrated_w()
+			))
+
+		print(" tempF[{}]".format(myAS726x.get_temperature_f()))
 
 if __name__ == '__main__':
 	try:
