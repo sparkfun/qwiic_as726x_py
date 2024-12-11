@@ -49,6 +49,7 @@ New to Qwiic? Take a look at the entire [SparkFun Qwiic ecosystem](https://www.s
 # platform, check it out here: https://github.com/sparkfun/Qwiic_I2C_Py
 import qwiic_i2c
 import time
+import struct
 
 # Define the device name and I2C addresses. These are set in the class defintion
 # as class variables, making them avilable without having to create a class
@@ -167,6 +168,11 @@ class QwiicAS726x(object):
     kLedConfigIndEnableMask = 0b1 << kLedConfigIndEnableShift
 
     # Values to write to current limit, gain, and mode 
+    kLedCurrentLimit12_5mA = 0b00
+    kLedCurrentLimit25mA = 0b01
+    kLedCurrentLimit50mA = 0b10
+    kLedCurrentLimit100mA = 0b11
+
     kIndicatorCurrentLimit1mA = 0b00
     kIndicatorCurrentLimit2mA = 0b01
     kIndicatorCurrentLimit4mA = 0b10
@@ -374,7 +380,6 @@ class QwiicAS726x(object):
         """
         Enable the onboard indicator LED
         """
-        self.select_device(self.kLedNir)
 
         value = self.virtual_read_register(self.kLedConfig)
         value |= self.kLedConfigIndEnableMask
@@ -385,7 +390,6 @@ class QwiicAS726x(object):
         """
         Disable the onboard indicator LED
         """
-        self.select_device(self.kLedNir)
 
         value = self.virtual_read_register(self.kLedConfig)
         value &= ~self.kLedConfigIndEnableMask
@@ -699,7 +703,21 @@ class QwiicAS726x(object):
         # Channel calibrated values are stored big-endian
         calBytes = (b0 << 24) | (b1 << 16) | (b2 << 8) | b3
 
-        return calBytes
+        return self.convert_bytes_to_float(calBytes)
+    
+    def convert_bytes_to_float(self, myLong):
+        """
+        Convert a 4-byte value containing the bytes of a float respresentation of a number 
+        to a float value
+
+        :param myLong: The 4-byte value to convert
+        :type myLong: int
+
+        :return: The float value
+        :rtype: float
+        """
+        packed_val = struct.pack('I', myLong)
+        return struct.unpack('f', packed_val)[0]
 
     def clear_data_available(self):
         """

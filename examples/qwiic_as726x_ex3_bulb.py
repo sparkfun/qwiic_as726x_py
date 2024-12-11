@@ -71,7 +71,7 @@ def runExample():
 				myAS726x.get_calibrated_yellow(),
 				myAS726x.get_calibrated_orange(),
 				myAS726x.get_calibrated_red()
-			))
+			), end="")
 		
 		elif myAS726x.get_version() == myAS726x.kSensorTypeAs7263:
 			# Near IR readings
@@ -82,7 +82,7 @@ def runExample():
 				myAS726x.get_calibrated_u(),
 				myAS726x.get_calibrated_v(),
 				myAS726x.get_calibrated_w()
-			))
+			), end="")
 
 		print(" tempF[{}]".format(myAS726x.get_temperature_f()))
 
