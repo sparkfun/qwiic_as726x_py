@@ -35,7 +35,7 @@
 # SOFTWARE.
 #===============================================================================
 
-"""
+"""!
 qwiic_as726x
 ============
 Python module for the [SparkFun Qwiic AS7262 Visible Spectral Sensor](https://www.sparkfun.com/products/14347)
@@ -189,15 +189,13 @@ class QwiicAS726x(object):
     kMeasurementMode6ChanOneShot = 0b11
 
     def __init__(self, address=None, i2c_driver=None):
-        """
+        """!
         Constructor
 
-        :param address: The I2C address to use for the device
+        @param int, optional address: The I2C address to use for the device
             If not provided, the default address is used
-        :type address: int, optional
-        :param i2c_driver: An existing i2c driver object
+        @param I2CDriver, optional i2c_driver: An existing i2c driver object
             If not provided, a driver object is created
-        :type i2c_driver: I2CDriver, optional
         """
 
         # Use address if provided, otherwise pick the default
@@ -218,11 +216,10 @@ class QwiicAS726x(object):
         self._sensorVersion = 0
 
     def is_connected(self):
-        """
+        """!
         Determines if this device is connected
 
-        :return: `True` if connected, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if connected, otherwise `False`
         """
         # Check if connected by seeing if an ACK is received
         return self._i2c.isDeviceConnected(self.address)
@@ -230,11 +227,10 @@ class QwiicAS726x(object):
     connected = property(is_connected)
 
     def begin(self, gain = kGain64x, measurementMode = kMeasurementMode6ChanOneShot):
-        """
+        """!
         Initializes this device with default parameters
 
-        :return: Returns `True` if successful, otherwise `False`
-        :rtype: bool
+        @return **bool** Returns `True` if successful, otherwise `False`
         """
         # Confirm device is connected before doing anything
         if not self.is_connected():
@@ -265,10 +261,11 @@ class QwiicAS726x(object):
         return True
 
     def take_measurements(self):
-        """
+        """!
         Tells IC to take measurements and polls for data ready flag
+
+        @return  `True` if successful, otherwise `False`
         
-        :return: `True` if successful, otherwise `False`
         """
         # Clear the data ready flag
         self.clear_data_available()
@@ -287,16 +284,15 @@ class QwiicAS726x(object):
         return True
 
     def get_version(self):
-        """
+        """!
         Get the version of the sensor. Value is only valid after a call to `begin()`
-        
-        :return: The version of the sensor
-        :rtype: int
+
+        @return **int** The version of the sensor
         """
         return self._sensorVersion
 
     def take_measurements_with_bulb(self):
-        """
+        """!
         Turns on bulb, takes measurements, turns off bulb.
 
         NOTE: We don't turn on the indicator as it is red and may corrupt the readings
@@ -306,25 +302,23 @@ class QwiicAS726x(object):
         self.disable_bulb()
 
     def get_temperature(self, device):
-        """
+        """!
         Returns the temperature of a given device in Celsius
 
-        :param device: The device to get the temperature from
-        :type device: int
+        @param int device: The device to get the temperature from
         """
         return self.virtual_read_register(self.kDeviceTemp)
 
     def get_temperature_f(self):
-        """
+        """!
         Returns the temperature of a given device in Fahrenheit
 
-        :param device: The device to get the temperature from
-        :type device: int
+        @param int device: The device to get the temperature from
         """
         return (self.virtual_read_register(self.kDeviceTemp) * 1.8) + 32
 
     def set_measurement_mode(self, mode):
-        """
+        """!
         Sets the measurement mode
 
         Mode 0: 4 channels out of 6 (see datasheet)
@@ -332,8 +326,7 @@ class QwiicAS726x(object):
         Mode 2: All 6 channels continuously
         Mode 3: One-shot reading of all channels
 
-        :param mode: The mode to set
-        :type mode: int
+        @param int mode: The mode to set
 
         Allowable mode values are:
             - kMeasurementMode4Chan
@@ -351,11 +344,10 @@ class QwiicAS726x(object):
         self.virtual_write_register(self.kConfig, value)
 
     def get_measurement_mode(self):
-        """
+        """!
         Get the measurement mode
 
-        :return: The measurement mode
-        :rtype: int
+        @return **int** The measurement mode
 
         Allowable mode values are:
             - kMeasurementMode4Chan
@@ -367,17 +359,16 @@ class QwiicAS726x(object):
         return (value & self.kConfigModeMask) >> self.kConfigModeShift
 
     def data_available(self):
-        """
+        """!
         Check if the data ready flag is set in the control setup register
 
-        :return: `True` if the data ready flag is set, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if the data ready flag is set, otherwise `False`
         """
         value = self.virtual_read_register(self.kConfig)
         return (value & self.kConfigDataReadyMask) != 0
 
     def enable_indicator(self):
-        """
+        """!
         Enable the onboard indicator LED
         """
 
@@ -387,7 +378,7 @@ class QwiicAS726x(object):
         self.virtual_write_register(self.kLedConfig, value)
 
     def disable_indicator(self):
-        """
+        """!
         Disable the onboard indicator LED
         """
 
@@ -397,11 +388,10 @@ class QwiicAS726x(object):
         self.virtual_write_register(self.kLedConfig, value)
 
     def set_indicator_current(self, current):
-        """
+        """!
         Set the current limit of onboard LED. Default is max 8mA = 0b11.
 
-        :param current: The current limit to set the indicator LED to
-        :type current: int
+        @param int current: The current limit to set the indicator LED to
 
         Allowable current values are:
             - kIndicatorCurrentLimit1mA
@@ -420,7 +410,7 @@ class QwiicAS726x(object):
         self.virtual_write_register(self.kLedConfig, value)
 
     def enable_bulb(self):
-        """
+        """!
         Enable the LED or bulb on a given device
         """
 
@@ -430,7 +420,7 @@ class QwiicAS726x(object):
         self.virtual_write_register(self.kLedConfig, value)
 
     def disable_bulb(self):
-        """
+        """!
         Disable the LED or bulb on a given device
         """
 
@@ -441,11 +431,10 @@ class QwiicAS726x(object):
 
 
     def set_bulb_current(self, current):
-        """
+        """!
         Set the current for the specified LED
 
-        :param current: The current to set the LED to
-        :type current: int
+        @param int current: The current to set the LED to
 
         Allowable current values are:
             - kLedCurrentLimit12_5mA
@@ -464,15 +453,14 @@ class QwiicAS726x(object):
         self.virtual_write_register(self.kLedConfig, value)
 
     def set_gain(self, gain):
-        """
+        """!
         Sets the gain value
         Gain 0: 1x (power-on default)
         Gain 1: 3.7x
         Gain 2: 16x
         Gain 3: 64x
 
-        :param gain: The gain value to set
-        :type gain: int
+        @param int gain: The gain value to set
         """
         if gain > self.kGain64x:
             gain = self.kGain64x
@@ -484,17 +472,16 @@ class QwiicAS726x(object):
         self.virtual_write_register(self.kConfig, value)
 
     def get_gain(self):
-        """
+        """!
         Get the gain value
 
-        :return: The gain value
-        :rtype: int
+        @return **int** The gain value
         """
         value = self.virtual_read_register(self.kConfig)
         return (value & self.kConfigGainMask) >> self.kConfigGainShift
 
     def soft_reset(self):
-        """
+        """!
         Does a soft reset. Give sensor at least 1000ms to reset
         """
         value = self.virtual_read_register(self.kConfig)
@@ -502,27 +489,25 @@ class QwiicAS726x(object):
         self.virtual_write_register(self.kConfig, value) 
 
     def set_integration_time(self, integrationValue):
-        """
+        """!
         Sets the integration cycle amount. 
         Give this function a byte from 0 to 255.
         Time will be 2.8ms * [integration cycles + 1]
 
-        :param integrationValue: The number of integration cycles to set
-        :type integrationValue: int
+        @param int integrationValue: The number of integration cycles to set
         """
         self.virtual_write_register(self.kIntegrationTime, integrationValue)
 
     def get_integration_time(self):
-        """
+        """!
         Get the integration time
 
-        :return: The integration time
-        :rtype: int
+        @return **int** The integration time
         """
         return self.virtual_read_register(self.kIntegrationTime)
 
     def enable_interrupt(self):
-        """
+        """!
         Enable the interrupt pin
         """
         value = self.virtual_read_register(self.kConfig)
@@ -531,7 +516,7 @@ class QwiicAS726x(object):
         self.virtual_write_register(self.kConfig, value)
 
     def disable_interrupt(self):
-        """
+        """!
         Disable the interrupt pin
         """
         value = self.virtual_read_register(self.kConfig)
@@ -675,25 +660,22 @@ class QwiicAS726x(object):
     
     # Helper functions
     def get_channel(self, channelReg):
-        """
+        """!
         Get the value of a channel
 
-        :param channel_register: The register to read the channel from
-        :type channel_register: int
+        @param int channel_register: The register to read the channel from
         """
         color_data = self.virtual_read_register(channelReg) << 8  # High byte
         color_data |= self.virtual_read_register(channelReg + 1)  # Low byte
         return color_data
 
     def get_calibrated_value(self, calAddress):
-        """
+        """!
         Given an address, read four bytes and return the floating point calibrated value
 
-        :param calAddress: The address to read the calibrated value from
-        :type calAddress: int
+        @param int calAddress: The address to read the calibrated value from
 
-        :return: The calibrated value
-        :rtype: float
+        @return **float** The calibrated value
         """
         b0 = self.virtual_read_register(calAddress + 0)
         b1 = self.virtual_read_register(calAddress + 1)
@@ -706,21 +688,19 @@ class QwiicAS726x(object):
         return self.convert_bytes_to_float(calBytes)
     
     def convert_bytes_to_float(self, myLong):
-        """
+        """!
         Convert a 4-byte value containing the bytes of a float respresentation of a number 
         to a float value
 
-        :param myLong: The 4-byte value to convert
-        :type myLong: int
+        @param int myLong: The 4-byte value to convert
 
-        :return: The float value
-        :rtype: float
+        @return **float** The float value
         """
         packed_val = struct.pack('I', myLong)
         return struct.unpack('f', packed_val)[0]
 
     def clear_data_available(self):
-        """
+        """!
         Clear the data ready flag in the config register
         """
         value = self.virtual_read_register(self.kConfig)
@@ -728,14 +708,12 @@ class QwiicAS726x(object):
         self._i2c.write_byte(self.address, self.kConfig, value)
 
     def virtual_read_register(self, virtualAddr):
-        """
+        """!
         Read a virtual register from the AS726x
 
-        :param virtualAddr: The virtual register address to read
-        :type virtualAddr: int
+        @param int virtualAddr: The virtual register address to read
 
-        :return: The value read from the register or -1 if an error occurred
-        :rtype: int
+        @return **int** The value read from the register or -1 if an error occurred
         """
         status = self._i2c.read_byte(self.address, self.kStatusReg)
 
@@ -772,17 +750,13 @@ class QwiicAS726x(object):
 
 
     def virtual_write_register(self, virtualAddr, dataToWrite):
-        """
+        """!
         Write a virtual register to the AS726x
 
-        :param virtualAddr: The virtual register address to write
-        :type virtualAddr: int
+        @param int virtualAddr: The virtual register address to write
+        @param int dataToWrite: The value to write to the register
 
-        :param dataToWrite: The value to write to the register
-        :type dataToWrite: int
-
-        :return: `True` if successful, otherwise `False`
-        :rtype: bool
+        @return **bool** `True` if successful, otherwise `False`
         """
         # Wait for WRITE register to be empty
         retries = 0
